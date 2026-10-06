@@ -1,0 +1,4 @@
+strategy,questions,page_acc,rougeL_f,rougeL_r,bleu
+base_128,89,82.022,0.387,0.397,0.223
+base_256,89,80.899,0.419,0.526,0.272
+base_512,89,78.652,0.409,0.701,0.305

@@ -5,33 +5,30 @@ import pandas as pd
 import pymupdf
 
 ROOT = Path(__file__).resolve().parent.parent
-PDF_DIR = ROOT / "data" / "pdfs"
-OUT = ROOT / "data" / "processed"
+RAW, PDF_DIR, OUT = ROOT / "data/raw", ROOT / "data/pdfs", ROOT / "data/processed"
 
-MAX_PAGES = 200
-N_DOCS = 20
-SEED = 42
+MAX_PAGES_PER_DOC = 300
+PAGE_BUDGET = 3000   # total pages we are willing to parse with hi_res
 
 qa = pd.read_json(OUT / "questions_available.jsonl", lines=True)
 ev = pd.read_json(OUT / "evidence_pieces.jsonl", lines=True)
+meta = (pd.read_json(RAW / "financebench_document_information.jsonl", lines=True)
+        .drop_duplicates("doc_name")[["doc_name", "doc_type"]])
 
-# Page counts per document
 docs = pd.DataFrame({"doc_name": sorted(qa["doc_name"].unique())})
-docs["n_pages"] = docs["doc_name"].apply(
-    lambda d: len(pymupdf.open(PDF_DIR / f"{d}.pdf"))
-)
-docs = docs.merge(qa.groupby("doc_name").size().rename("n_questions").reset_index())
-print("All docs: pages summary")
-print(docs["n_pages"].describe().round(1))
+docs["n_pages"] = docs["doc_name"].apply(lambda d: len(pymupdf.open(PDF_DIR / f"{d}.pdf")))
+docs = (docs.merge(qa.groupby("doc_name").size().rename("n_questions").reset_index())
+            .merge(meta, on="doc_name", how="left"))
+docs["density"] = docs["n_questions"] / docs["n_pages"]
 
-# Eligible docs, then a reproducible sample
-eligible = docs[docs["n_pages"] <= MAX_PAGES]
-print(f"\nEligible docs (<= {MAX_PAGES} pages): {len(eligible)} "
-      f"with {eligible['n_questions'].sum()} questions")
-chosen = eligible.sample(n=min(N_DOCS, len(eligible)), random_state=SEED)
-chosen_names = set(chosen["doc_name"])
+# Greedy: densest documents first until the page budget is used
+chosen, used = [], 0
+for _, r in docs[docs["n_pages"] <= MAX_PAGES_PER_DOC].sort_values("density", ascending=False).iterrows():
+    if used + r["n_pages"] <= PAGE_BUDGET:
+        chosen.append(r["doc_name"])
+        used += r["n_pages"]
+chosen_docs = docs[docs["doc_name"].isin(chosen)].sort_values("doc_name")
 
-# Per-question gold pages (0-indexed) and a rough "numeric/table-like" flag
 def digit_ratio(text):
     t = re.sub(r"\s", "", text or "")
     return sum(c.isdigit() for c in t) / max(len(t), 1)
@@ -42,17 +39,16 @@ g = ev.groupby("financebench_id").agg(
     gold_texts=("evidence_text", list),
     max_digit_ratio=("digit_ratio", "max"),
 ).reset_index()
-g["table_like"] = g["max_digit_ratio"] > 0.25   # heuristic only
+g["table_like"] = g["max_digit_ratio"] > 0.25   # rough heuristic only
 
-sub = qa[qa["doc_name"].isin(chosen_names)].merge(g, on="financebench_id")
-sub = sub.drop(columns=["evidence"])
+sub = qa[qa["doc_name"].isin(chosen)].merge(g, on="financebench_id").drop(columns=["evidence"])
 
-print(f"\nSelected {sub['doc_name'].nunique()} docs, {len(sub)} questions")
+print(f"Selected {len(chosen_docs)} docs | {used} pages | {len(sub)} questions")
+print("\nDocument types (selected):\n", chosen_docs["doc_type"].value_counts().to_string())
+print("\nDocument types (all 84):\n", docs["doc_type"].value_counts().to_string())
 print("\nQuestion types:\n", sub["question_type"].value_counts().to_string())
-print("\nQuestion reasoning:\n", sub["question_reasoning"].value_counts().to_string())
-print("\nTable-like evidence (heuristic):", int(sub["table_like"].sum()), "/", len(sub))
-print("Questions with multiple gold pages:", int((sub["gold_pages"].str.len() > 1).sum()))
+print("\nTable-like evidence:", int(sub["table_like"].sum()), "/", len(sub))
+print("Multi-page gold:", int((sub["gold_pages"].str.len() > 1).sum()))
 
 sub.to_json(OUT / "subset_questions.jsonl", orient="records", lines=True)
-chosen.sort_values("doc_name").to_csv(OUT / "subset_docs.csv", index=False)
-print("\nSaved subset_questions.jsonl and subset_docs.csv in", OUT)
+chosen_docs.to_csv(OUT / "subset_docs.csv", index=False)

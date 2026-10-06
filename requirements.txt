@@ -1,0 +1,10 @@
+pandas
+requests
+pymupdf
+tiktoken
+sentence-transformers
+faiss-cpu
+rouge-score
+sacrebleu
+unstructured[pdf]
+tqdm

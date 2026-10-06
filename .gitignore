@@ -1,0 +1,6 @@
+data/pdfs/
+data/parsed/
+indexes/
+__pycache__/
+.ipynb_checkpoints/
+.env

@@ -1,0 +1,8 @@
+strategy,questions,page_acc,rougeL_f,rougeL_r,bleu
+base_128,4,100.0,0.63,0.594,0.462
+base_256,4,50.0,0.381,0.413,0.29
+base_512,4,100.0,0.588,1.0,0.438
+element_plain,4,100.0,0.907,1.0,0.843
+element_prefix,4,100.0,0.907,1.0,0.843
+llm_llama-3.1-8b-instant_plain,4,100.0,0.942,1.0,0.894
+llm_llama-3.1-8b-instant_prefix,4,100.0,0.942,1.0,0.894

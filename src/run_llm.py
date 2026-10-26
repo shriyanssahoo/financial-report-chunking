@@ -23,6 +23,7 @@ import hashlib
 import json
 import os
 import re
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -36,7 +37,7 @@ ROOT = Path(__file__).resolve().parent.parent
 PARSED, OUT = ROOT / "data/parsed", ROOT / "data/processed"
 IDX, RES = ROOT / "indexes", ROOT / "results/retrieval"
 
-TOP_K, MAX_CHARS, PROMPT_CHARS = 10, 2048, 400
+TOP_K, MAX_CHARS, PROMPT_CHARS = 10, 2048, 250   # PROMPT_CHARS: text of each element shown to the LLM
 SKIP = {"Header", "Footer", "PageNumber"}
 ARGS = None   # filled in by main()
 
@@ -104,16 +105,51 @@ def parse_starts(raw, n):
     return nums or None
 
 
-def ask(items, tries=4):
+_throttle_lock, _last_call = threading.Lock(), [0.0]
+
+
+def throttle():
+    """Keep at most --rpm calls per minute (0 = no limit). Protects against API token-per-minute limits."""
+    if not ARGS.rpm:
+        return
+    with _throttle_lock:
+        wait = _last_call[0] + 60.0 / ARGS.rpm - time.time()
+        if wait > 0:
+            time.sleep(wait)
+        _last_call[0] = time.time()
+
+
+def retry_wait(resp, attempt):
+    """Seconds to wait after an error. For rate limits, use the time the API tells us."""
+    wait = min(5 * 2 ** attempt, 60)
+    if resp is not None and resp.status_code == 429:
+        m = re.search(r"try again in (?:(\d+)m)?([\d.]+)s", resp.text)
+        if m:
+            wait = int(m.group(1) or 0) * 60 + float(m.group(2)) + 1
+        if wait > 180:   # that is a daily limit, not a short pause: stop instead of silently using the fallback
+            raise RuntimeError(f"Rate limit needs a {wait / 60:.0f}-minute wait (daily limit?). "
+                               "Re-run later: pages already answered are saved and will not be asked again.")
+    return wait
+
+
+def ask(items, tries=6):
     """Return a list of 'start' numbers, or None if the LLM could not give a usable answer."""
     prompt = build_prompt(items)
     for attempt in range(tries):
+        throttle()
         try:
             starts = parse_starts(call_llm(prompt), len(items))
             if starts:
                 return starts
-        except requests.RequestException:
-            time.sleep(5 * 2 ** attempt)      # rate limit / network: wait and retry
+        except requests.RequestException as e:
+            resp = getattr(e, "response", None)
+            if not getattr(ask, "warned", False):            # show the first error so problems are visible
+                ask.warned = True
+                body = (resp.text[:300] if resp is not None else "")
+                print(f"\n!! LLM call failed: {e}\n!! {body}")
+            if resp is not None and resp.status_code in (400, 401, 403, 404):
+                return None                                  # wrong key / model / request: retrying won't help
+            time.sleep(retry_wait(resp, attempt))
     return None
 
 
@@ -159,12 +195,18 @@ def chunk_doc(doc):
     cache = json.load(open(cache_file)) if cache_file.exists() else {}
 
     todo = [pg for pg, items in pages.items() if len(items) > 1 and str(pg) not in cache]
-    with ThreadPoolExecutor(ARGS.workers) as ex:
-        answers = list(tqdm(ex.map(lambda pg: ask(pages[pg]), todo), total=len(todo), desc=f"LLM {doc}"))
-    for pg, a in zip(todo, answers):
+    save_lock = threading.Lock()
+
+    def work(pg):
+        a = ask(pages[pg])
         if a is not None:                               # only remember good answers; failures retry next run
-            cache[str(pg)] = a
-    cache_file.write_text(json.dumps(cache))
+            with save_lock:
+                cache[str(pg)] = a
+                cache_file.write_text(json.dumps(cache))   # saved after every page, so a stop loses nothing
+        return a
+
+    with ThreadPoolExecutor(ARGS.workers) as ex:
+        list(tqdm(ex.map(work, todo), total=len(todo), desc=f"LLM {doc}"))
 
     chunks, n_fallback = [], 0
     for pg, items in pages.items():
@@ -202,6 +244,8 @@ def main():
     ap.add_argument("--host", default="http://localhost:11434", help="Ollama address")
     ap.add_argument("--base-url", default="", help="OpenAI-compatible API base URL")
     ap.add_argument("--workers", type=int, default=1, help="parallel LLM calls (use 2-4 for APIs)")
+    ap.add_argument("--rpm", type=int, default=0,
+                    help="max LLM calls per minute (0 = no limit). Free Groq: try 5")
     ap.add_argument("--docs", nargs="*", help="only these documents (test mode, writes *_test files)")
     ARGS = ap.parse_args()
 

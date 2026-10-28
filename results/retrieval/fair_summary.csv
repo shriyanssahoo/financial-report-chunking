@@ -1,0 +1,8 @@
+strategy,questions,page_any,page_start,chars,rougeL_f,table_page_start
+base_128,34,94.12,85.29,4910.44,0.47,62.5
+base_256,34,88.24,82.35,9568.12,0.52,75.0
+base_512,34,94.12,82.35,18805.71,0.52,87.5
+element_plain,34,82.35,79.41,8180.41,0.54,62.5
+element_prefix,34,88.24,85.29,9036.21,0.55,75.0
+llm_gemini-3.5-flash-lite_plain,34,82.35,82.35,5833.56,0.55,62.5
+llm_gemini-3.5-flash-lite_prefix,34,82.35,82.35,6791.53,0.58,62.5

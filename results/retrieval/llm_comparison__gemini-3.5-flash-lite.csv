@@ -1,0 +1,8 @@
+strategy,questions,page_acc,rougeL_f,rougeL_r,bleu
+base_128,42,92.857,0.417,0.399,0.23
+base_256,42,90.476,0.495,0.554,0.34
+base_512,42,90.476,0.493,0.772,0.383
+element_plain,42,76.19,0.486,0.598,0.357
+element_prefix,42,78.571,0.493,0.606,0.363
+llm_gemini-3.5-flash-lite_plain,42,78.571,0.48,0.524,0.338
+llm_gemini-3.5-flash-lite_prefix,42,73.81,0.504,0.548,0.355

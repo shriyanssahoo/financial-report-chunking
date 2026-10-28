@@ -59,10 +59,11 @@ def load_pages(doc):
 # ----------------------------------------------------------------------------- talking to the LLM
 def build_prompt(items):
     lines = []
+    limit = getattr(ARGS, "prompt_chars", 0) or PROMPT_CHARS
     for i, it in enumerate(items, 1):
         t = it["text"].replace("\n", " ")
-        if len(t) > PROMPT_CHARS:
-            t = t[:PROMPT_CHARS] + " ..."
+        if len(t) > limit:
+            t = t[:limit] + " ..."
         lines.append(f"[{i}] ({it['type']}) {t}")
     return (
         "Below are the numbered elements of ONE page of a financial report "
@@ -85,9 +86,11 @@ def call_llm(prompt):
         r.raise_for_status()
         return r.json()["message"]["content"]
     key = os.environ.get("LLM_API_KEY", "")
+    body = {"model": ARGS.model, "messages": msgs, "temperature": 0}
+    if getattr(ARGS, "reasoning_effort", ""):
+        body["reasoning_effort"] = ARGS.reasoning_effort      # fewer 'thinking' tokens on models that support it
     r = requests.post(f"{ARGS.base_url.rstrip('/')}/chat/completions", timeout=120,
-                      headers={"Authorization": f"Bearer {key}"},
-                      json={"model": ARGS.model, "messages": msgs, "temperature": 0})
+                      headers={"Authorization": f"Bearer {key}"}, json=body)
     r.raise_for_status()
     return r.json()["choices"][0]["message"]["content"]
 
@@ -106,6 +109,19 @@ def parse_starts(raw, n):
 
 
 _throttle_lock, _last_call = threading.Lock(), [0.0]
+ABORT = threading.Event()
+QUOTA = {"in_a_row": 0}     # counts 429 errors in a row; many in a row = daily quota used up
+
+
+def preflight():
+    """One tiny test call before the long run, so a bad key / model fails in seconds, not hours."""
+    try:
+        call_llm("Reply with exactly: [1]")
+    except requests.RequestException as e:
+        resp = getattr(e, "response", None)
+        raise SystemExit(f"\nTest call to the LLM failed: {e}\n{resp.text[:300] if resp is not None else ''}\n"
+                         "Fix the key / model / URL (is $env:LLM_API_KEY set in THIS window?) and run again.")
+    print("LLM test call OK")
 
 
 def throttle():
@@ -136,9 +152,12 @@ def ask(items, tries=6):
     """Return a list of 'start' numbers, or None if the LLM could not give a usable answer."""
     prompt = build_prompt(items)
     for attempt in range(tries):
+        if ABORT.is_set():                                   # another page already hit a fatal error
+            return None
         throttle()
         try:
             starts = parse_starts(call_llm(prompt), len(items))
+            QUOTA["in_a_row"] = 0
             if starts:
                 return starts
         except requests.RequestException as e:
@@ -147,11 +166,21 @@ def ask(items, tries=6):
                 ask.warned = True
                 body = (resp.text[:300] if resp is not None else "")
                 print(f"\n!! LLM call failed: {e}\n!! {body}")
-            if resp is not None and resp.status_code in (400, 401, 403, 404):
-                return None                                  # wrong key / model / request: retrying won't help
+            if resp is not None and resp.status_code in (401, 403, 404):
+                ABORT.set()                                  # wrong key / model: stop the whole run now
+                raise RuntimeError(f"The API refused the request ({resp.status_code}). "
+                                   "Check LLM_API_KEY, --model and --base-url, then run again.")
+            if resp is not None and resp.status_code == 400:
+                return None                                  # this page's request was bad: use the fallback
+            if resp is not None and resp.status_code == 429:
+                QUOTA["in_a_row"] += 1
+                if QUOTA["in_a_row"] >= 6:                   # many in a row = daily quota is used up
+                    ABORT.set()
+                    raise RuntimeError("The API keeps saying 'quota exceeded' (6 times in a row). Your free daily "
+                                       "quota is probably used up. Run the same command again later (Gemini's daily "
+                                       "quota resets around 12:30 PM India time). Answered pages are saved.")
             time.sleep(retry_wait(resp, attempt))
     return None
-
 
 def fallback_starts(items):
     """Simple rule used when the LLM fails: a new chunk at every Title."""
@@ -246,6 +275,12 @@ def main():
     ap.add_argument("--workers", type=int, default=1, help="parallel LLM calls (use 2-4 for APIs)")
     ap.add_argument("--rpm", type=int, default=0,
                     help="max LLM calls per minute (0 = no limit). Free Groq: try 5")
+    ap.add_argument("--reasoning-effort", default="", choices=["", "low", "medium", "high"],
+                    help="optional: 'low' uses fewer tokens on reasoning models (e.g. gpt-oss, Gemini)")
+    ap.add_argument("--prompt-chars", type=int, default=0,
+                    help="characters of each element shown to the LLM (default 250; smaller = fewer tokens)")
+    ap.add_argument("--max-pages", type=int, default=0,
+                    help="only documents with at most this many pages (0 = all). Extend later: cached pages are not repeated")
     ap.add_argument("--docs", nargs="*", help="only these documents (test mode, writes *_test files)")
     ARGS = ap.parse_args()
 
@@ -265,8 +300,12 @@ def main():
         qs = qs[qs["financebench_id"].isin(pd.read_json(el_file, lines=True)["financebench_id"])]
     if ARGS.docs:
         qs = qs[qs["doc_name"].isin(ARGS.docs)]
+    if ARGS.max_pages:
+        sd = pd.read_csv(OUT / "subset_docs.csv")
+        qs = qs[qs["doc_name"].isin(set(sd.loc[sd["n_pages"] <= ARGS.max_pages, "doc_name"]))]
     print(f"{qs['doc_name'].nunique()} docs, {len(qs)} questions | model {ARGS.model} ({ARGS.provider})")
 
+    preflight()
     enc = SentenceTransformer("sentence-transformers/multi-qa-mpnet-base-dot-v1")
     rouge = rouge_scorer.RougeScorer(["rougeL"], use_stemmer=False)
     bleu = BLEU(effective_order=True)
@@ -319,4 +358,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except RuntimeError as e:                 # fatal API problems: show one clear line, not a traceback
+        raise SystemExit(f"\nSTOPPED: {e}")

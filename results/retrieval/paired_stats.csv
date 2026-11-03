@@ -1,0 +1,11 @@
+comparison,A,B,A_wins,B_wins,p_exact
+Hierarchical vs flat (same element chunks),hier_element_P10,element_plain,5,0,0.062
+Hierarchical vs flat (same LLM chunks),hier_llm_gemini-3.5-flash-lite_P10,llm_gemini-3.5-flash-lite_plain,4,0,0.125
+Hierarchical(element) vs element prefix,hier_element_P10,element_prefix,4,0,0.125
+Hierarchical(element) vs base_128,hier_element_P10,base_128,4,3,1.0
+Hierarchical(element) vs base_256,hier_element_P10,base_256,4,4,1.0
+Hierarchical(element) vs base_512,hier_element_P10,base_512,7,4,0.549
+Hierarchical(LLM) vs base_128,hier_llm_gemini-3.5-flash-lite_P10,base_128,4,2,0.688
+Hierarchical(LLM) vs base_256,hier_llm_gemini-3.5-flash-lite_P10,base_256,3,2,1.0
+Hierarchical(LLM) vs base_512,hier_llm_gemini-3.5-flash-lite_P10,base_512,6,2,0.289
+LLM chunking vs element chunking (flat),llm_gemini-3.5-flash-lite_plain,element_plain,2,0,0.5

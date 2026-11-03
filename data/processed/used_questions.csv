@@ -1,0 +1,43 @@
+financebench_id,doc_name,question,question_type,table_like
+financebench_id_00283,Pfizer_2023Q2_10Q,How much does Pfizer expect to pay to spin off Upjohn in the future in USD million?,novel-generated,False
+financebench_id_00288,BESTBUY_2024Q2_10Q,Was there any drop in Cash & Cash equivalents between FY 2023 and Q2 of FY2024?,novel-generated,False
+financebench_id_00382,MGMRESORTS_2022Q4_EARNINGS,Which region had the Highest EBITDAR Contribution for MGM during FY2022?,novel-generated,True
+financebench_id_00407,MGMRESORTS_2023Q2_10Q,Which type of debt received the largest investment among the short term investments for MGM in H1 FY2023?,novel-generated,False
+financebench_id_00438,ADOBE_2022_10K,"Does Adobe have an improving operating margin profile as of FY2022? If operating margin is not a useful metric for a company like this, then state that and explain why.",domain-relevant,True
+financebench_id_00460,BESTBUY_2024Q2_10Q,Was there any change in the number of Best Buy stores between Q2 of FY2024 and FY2023?,novel-generated,False
+financebench_id_00591,ADOBE_2022_10K,Does Adobe have an improving Free cashflow conversion as of FY2022?,novel-generated,False
+financebench_id_00601,ULTABEAUTY_2023Q4_EARNINGS,What drove the reduction in SG&A expense as a percent of net sales in FY2023?,novel-generated,False
+financebench_id_00603,ULTABEAUTY_2023Q4_EARNINGS,What drove the increase in Ulta Beauty's merchandise inventories balance at end of FY2023?,novel-generated,False
+financebench_id_00605,ULTABEAUTY_2023Q4_EARNINGS,What percent of Ulta Beauty's total spend on stock repurchases for FY 2023 occurred in Q4 of FY2023?,novel-generated,False
+financebench_id_00606,ULTABEAUTY_2023Q4_EARNINGS,Did Ulta Beauty's wages expense as a percent of net sales increase or decrease in FY2023?,novel-generated,False
+financebench_id_00651,JOHNSON_JOHNSON_2022Q4_EARNINGS,Is growth in JnJ's adjusted EPS expected to accelerate in FY2023?,novel-generated,False
+financebench_id_00685,BESTBUY_2023_10K,"Are Best Buy's gross margins historically consistent (not fluctuating more than roughly 2% each year)? If gross margins are not a relevant metric for a company like this, then please state that and explain why.",domain-relevant,False
+financebench_id_00724,Pfizer_2023Q2_10Q,"For Pfizer, which geographic region had the biggest drop in Q22023 year over year revenues (on a percentage basis)?",novel-generated,True
+financebench_id_00807,3M_2023Q2_10Q,"Does 3M have a reasonably healthy liquidity profile based on its quick ratio for Q2 of FY2023? If the quick ratio is not relevant to measure liquidity, please state that and explain why.",domain-relevant,False
+financebench_id_00822,FOOTLOCKER_2022_8K_dated-2022-05-20,Were there any board member nominees who had substantially more votes against joining than the other nominees?,novel-generated,True
+financebench_id_00839,FOOTLOCKER_2022_8K_dated_2022-08-19,Does Foot Locker's new CEO have previous CEO experience in a similar company to Footlocker?,novel-generated,False
+financebench_id_00941,3M_2023Q2_10Q,Which debt securities are registered to trade on a national securities exchange under 3M's name as of Q2 of 2023?,domain-relevant,False
+financebench_id_01077,BESTBUY_2023_10K,"What are major acquisitions that Best Buy has done in FY2023, FY2022 and FY2021?",domain-relevant,False
+financebench_id_01275,BESTBUY_2023_10K,"Among operations, investing, and financing activities, which brought in the most (or lost the least) cash flow for Best Buy in FY2023?",domain-relevant,False
+financebench_id_01474,PEPSICO_2023Q1_EARNINGS,"As of FY2023Q1, why did Pepsico raise full year guidance for FY2023?",novel-generated,False
+financebench_id_01476,PEPSICO_2023Q1_EARNINGS,"As of FY2023Q1, by how many percentage points did Pepsico raise full year guidance in respect of core constant currency EPS growth?",novel-generated,False
+financebench_id_01482,PEPSICO_2023_8K_dated-2023-05-05,"At the Pepsico AGM held on May 3, 2023, what was the outcome of the shareholder vote on the shareholder proposal for a congruency report by Pepsico on net-zero emissions policies?",novel-generated,False
+financebench_id_01484,JOHNSON_JOHNSON_2022Q4_EARNINGS,How did JnJ's US sales growth compare to international sales growth in FY2022?,novel-generated,True
+financebench_id_01487,JOHNSON_JOHNSON_2023Q2_EARNINGS,Did JnJ's net earnings as a percent of sales increase in Q2 of FY2023 compared to Q2 of FY2022?,novel-generated,False
+financebench_id_01488,JOHNSON_JOHNSON_2023_8K_dated-2023-08-30,"Which business segment of JnJ will be treated as a discontinued operation from August 30, 2023 onward?",novel-generated,False
+financebench_id_01490,JOHNSON_JOHNSON_2023_8K_dated-2023-08-30,"What is the amount of the gain accruing to JnJ as a result of the separation of its Consumer Health business segment, as of August 30, 2023?",novel-generated,False
+financebench_id_01491,JOHNSON_JOHNSON_2023_8K_dated-2023-08-30,"What is the amount of the cash proceeds that JnJ realised from the separation of Kenvue (formerly Consumer Health business segment), as of August 30, 2023?",novel-generated,False
+financebench_id_01858,3M_2023Q2_10Q,Does 3M maintain a stable trend of dividend distribution?,novel-generated,False
+financebench_id_01902,BESTBUY_2024Q2_10Q,Which Best Buy product category performed the best (by top line) in the domestic (USA) Market during Q2 of FY2024?,novel-generated,False
+financebench_id_01911,MGMRESORTS_2022Q4_EARNINGS,What was MGM's interest coverage ratio using FY2022 Adjusted EBIT as the numerator and annual Interest Expense as the denominator?,novel-generated,True
+financebench_id_01912,MGMRESORTS_2022Q4_EARNINGS,Which region had the worst topline performance for MGM during FY2022?,novel-generated,False
+financebench_id_01928,AMCOR_2023Q4_EARNINGS,What Was AMCOR's Adjusted Non GAAP EBITDA for FY 2023,novel-generated,True
+financebench_id_01930,AMCOR_2023Q4_EARNINGS,"How much was the Real change in Sales for AMCOR in FY 2023 vs FY 2022, if we exclude the impact of FX movement, passthrough costs and one-off items?",novel-generated,False
+financebench_id_01935,AMCOR_2022_8K_dated-2022-07-01,What was the key agenda of the AMCOR's 8k filing dated 1st July 2022?,novel-generated,False
+financebench_id_01936,AMCOR_2023Q2_10Q,What is the nature & purpose of AMCOR's restructuring liability as oF Q2 of FY2023 close?,novel-generated,False
+financebench_id_02419,Pfizer_2023Q2_10Q,"As of Q2'2023, is Pfizer spinning off any large business segments?",novel-generated,False
+financebench_id_03282,NETFLIX_2017_10K,What is Netflix's year end FY2017 total current liabilities (in USD millions)? Base your judgments on the information provided primarily in the balance sheet.,metrics-generated,True
+financebench_id_04209,COSTCO_2021_10K,"Using only the information within the balance sheet, how much total assets did Costco have at the end of FY2021? Answer in USD millions.",metrics-generated,False
+financebench_id_04458,NETFLIX_2015_10K,We want to calculate a financial metric. Please help us compute it by basing your answers off of the statement of income and the statement of cash flows. Here's the question: what is the FY2015 unadjusted EBITDA % margin for Netflix? Calculate unadjusted EBITDA using unadjusted operating income and D&A (from cash flow statement).,metrics-generated,True
+financebench_id_06655,AMAZON_2017_10K,What is Amazon's FY2017 days payable outstanding (DPO)? DPO is defined as: 365 * (average accounts payable between FY2016 and FY2017) / (FY2017 COGS + change in inventory between FY2016 and FY2017). Round your answer to two decimal places. Address the question by using the line items and information shown within the balance sheet and the P&L statement.,metrics-generated,True
+financebench_id_08135,AMAZON_2017_10K,What is Amazon's year-over-year change in revenue from FY2016 to FY2017 (in units of percents and round to one decimal place)? Calculate what was asked by utilizing the line items clearly shown in the statement of income.,metrics-generated,True

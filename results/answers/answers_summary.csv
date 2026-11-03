@@ -1,0 +1,8 @@
+method,questions,correct,accuracy_%,table_like_%
+base_256,42,23,54.8,36.4
+hier_element_P10,42,23,54.8,36.4
+hier_llm_P10,42,25,59.5,45.5
+oracle,42,27,64.3,90.9
+hier_llm_P10 vs base_256,42,6-4,p=0.754,
+hier_element_P10 vs base_256,42,5-5,p=1.000,
+hier_llm_P10 vs hier_element_P10,42,2-0,p=0.500,

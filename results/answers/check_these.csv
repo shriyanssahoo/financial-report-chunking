@@ -1,0 +1,242 @@
+financebench_id,method,question,gold_answer,model_answer,judge_says_correct,your_verdict
+financebench_id_01487,base_256,Did JnJ's net earnings as a percent of sales increase in Q2 of FY2023 compared to Q2 of FY2022?,"Yes, net earnings as a percent of sales increased from 20% in Q2 of FY2022 to 20.1% in Q2 of FY2023.","**Key Numbers Used:**
+*   **Q2 2023 Reported Sales:** $25,530 million [8]
+*   **Q2 2023 Net Earnings:** $5,144 million [8]
+*   **Q2 2022 Reported Sales:** $24,020 million [8]
+*   **Q2 2022 Net Earnings:** $4,814 million [8]
+
+**Calculation:**
+*   Q2 2023 Net Earnings as a % of Sales: $\frac{\$5,144}{\$25,530} \approx 20.15\%$
+*   Q2 2022 Net Earnings as a % of Sales: $\frac{\$4,814}{\$24,020} \approx 20.04\%$
+
+**Final Answer:**
+Yes, J&J's net earnings as a percent of sales increased slightly from approximately 20.04% in Q2 2022 to 20.15% in Q2 2023.",True,yes
+financebench_id_01487,hier_element_P10,Did JnJ's net earnings as a percent of sales increase in Q2 of FY2023 compared to Q2 of FY2022?,"Yes, net earnings as a percent of sales increased from 20% in Q2 of FY2022 to 20.1% in Q2 of FY2023.","**Key Numbers Used:**
+* Q2 2023 Net earnings as a percent of sales: 20.1% ($5,144 million net earnings on $25,530 million sales)
+* Q2 2022 Net earnings as a percent of sales: 20.0% ($4,814 million net earnings on $24,020 million sales)
+
+**Final Answer:**
+Yes, J&J's net earnings as a percent of sales increased from 20.0% in Q2 2022 to 20.1% in Q2 2023.",True,yes
+financebench_id_01487,hier_llm_P10,Did JnJ's net earnings as a percent of sales increase in Q2 of FY2023 compared to Q2 of FY2022?,"Yes, net earnings as a percent of sales increased from 20% in Q2 of FY2022 to 20.1% in Q2 of FY2023.","**Key Numbers Used:**
+* Q2 2023 Net earnings as a percent of sales: 20.1% ($5,144 million net earnings on $25,530 million sales)
+* Q2 2022 Net earnings as a percent of sales: 20.0% ($4,814 million net earnings on $24,020 million sales)
+
+**Answer:** 
+Yes, J&J's net earnings as a percent of sales increased from 20.0% in Q2 2022 to 20.1% in Q2 2023.",True,yes
+financebench_id_01487,oracle,Did JnJ's net earnings as a percent of sales increase in Q2 of FY2023 compared to Q2 of FY2022?,"Yes, net earnings as a percent of sales increased from 20% in Q2 of FY2022 to 20.1% in Q2 of FY2023.","**Key Numbers Used:**
+* Net earnings as a percent of sales (Period 1): 20.1%
+* Net earnings as a percent of sales (Period 2): 20.0%
+
+**Final Answer:**
+Yes, J&J's net earnings as a percent of sales increased from 20.0% to 20.1%.",True,yes
+financebench_id_01490,base_256,"What is the amount of the gain accruing to JnJ as a result of the separation of its Consumer Health business segment, as of August 30, 2023?",JnJ will make a gain of approximately $20 billion from the separation of its Consumer Health business segment.,"**Key Numbers Used:**
+* Excerpt [7]: ""...including a gain of approximately $20 billion in the third quarter of 2023.""
+
+**Final Answer:**
+Approximately $20 billion",True,yes
+financebench_id_01490,hier_element_P10,"What is the amount of the gain accruing to JnJ as a result of the separation of its Consumer Health business segment, as of August 30, 2023?",JnJ will make a gain of approximately $20 billion from the separation of its Consumer Health business segment.,"**Key Numbers Used:**
+* Excerpt [1]: Gain of approximately **$20 billion** in the third quarter of 2023 resulting from the completion of the exchange offer to finalize the separation of Kenvue Inc. (Johnson & Johnson’s Consumer Health business).
+
+**Short Final Answer:**
+Approximately **$20 billion**",True,yes
+financebench_id_01490,hier_llm_P10,"What is the amount of the gain accruing to JnJ as a result of the separation of its Consumer Health business segment, as of August 30, 2023?",JnJ will make a gain of approximately $20 billion from the separation of its Consumer Health business segment.,"**Key Numbers Used:**
+* Excerpt [2]: ""...including a gain of approximately $20 billion in the third quarter of 2023.""
+
+**Final Answer:**
+Approximately $20 billion.",True,yes
+financebench_id_01490,oracle,"What is the amount of the gain accruing to JnJ as a result of the separation of its Consumer Health business segment, as of August 30, 2023?",JnJ will make a gain of approximately $20 billion from the separation of its Consumer Health business segment.,"**Key Numbers Used:**
+* Gain of approximately $20 billion
+
+**Final Answer:**
+The gain resulting from the separation of the Consumer Health business is approximately $20 billion (recorded in the third quarter of 2023).",True,yes
+financebench_id_00382,base_256,Which region had the Highest EBITDAR Contribution for MGM during FY2022?,Las Vegas resorts contributed ~90% of company level EBITDAR during FY2022.,"**Key Numbers Used (Twelve months ended December 31, 2022, from Excerpt [3]):**
+* Las Vegas Strip Resorts: $3,142,308 thousand ($3.14 billion)
+* Regional Operations: $1,294,630 thousand ($1.29 billion)
+* MGM China: $(203,136) thousand ($(203) million)
+
+**Answer:**
+Las Vegas Strip Resorts",True,yes
+financebench_id_00382,hier_element_P10,Which region had the Highest EBITDAR Contribution for MGM during FY2022?,Las Vegas resorts contributed ~90% of company level EBITDAR during FY2022.,"Based on the excerpts provided:
+
+**Key Numbers Used:**
+* Regional Operations Adjusted Property EBITDAR (current year / 2022): $1.3 billion [3]
+* Consolidated Adjusted EBITDAR (2022): $3.5 billion [4]
+* Las Vegas Strip Resorts and Regional Operations achieved record Adjusted Property EBITDAR in 2022 [1], but specific full-year numbers for Las Vegas Strip Resorts are not detailed in the excerpts.
+
+**Final Answer:**
+The excerpts do not contain sufficient data to determine which specific region had the highest EBITDAR contribution for MGM during FY2022.",False,no
+financebench_id_00382,hier_llm_P10,Which region had the Highest EBITDAR Contribution for MGM during FY2022?,Las Vegas resorts contributed ~90% of company level EBITDAR during FY2022.,"Based on the provided excerpts, the information regarding the specific ""EBITDAR Contribution"" for all individual regions to determine the highest is not contained in the text. 
+
+Key numbers/facts available in excerpts:
+- Regional Operations Adjusted Property EBITDAR: $1.3 billion (current year) / $1.2 billion (prior year)
+- Las Vegas Strip Resorts and Regional Operations achieved record Adjusted Property EBITDAR in FY2022 (Excerpt 4)
+- MGM China Adjusted Property EBITDAR loss: $203 million (current year)
+- Consolidated Adjusted EBITDAR: $3.5 billion in 2022
+
+**Short Final Answer:**
+The provide",False,no
+financebench_id_00382,oracle,Which region had the Highest EBITDAR Contribution for MGM during FY2022?,Las Vegas resorts contributed ~90% of company level EBITDAR during FY2022.,"Key numbers used for FY2022 (Twelve months ended December 31, 2022):
+- Las Vegas Strip Resorts: $3,142,308
+- Regional Operations: $1,294,630
+- MGM China: $(203,136)
+- Unconsolidated affiliates: $(222,079)
+- Management and other operations: $(11,934)
+- Stock compensation: $(71,297)
+- Corporate: $(431,238)
+
+Final answer: Las Vegas Strip Resorts had the highest EBITDAR contribution for MGM during FY2022.",True,yes
+financebench_id_00839,base_256,Does Foot Locker's new CEO have previous CEO experience in a similar company to Footlocker?,Yes. She was previous CEO of Ulta Beauty which means she had to manage a large retail company that has brick and mortar + online business. So yes she was a CEO in a similar company to Foot Locker before this.,"**Key Numbers Used:**
+* None related to previous CEO experience.
+
+**Final Answer:**
+The excerpts do not contain information on whether Mary N. Dillon's previous CEO experience was in a company similar to Foot Locker (she is noted as the former Executive Chair and CEO of Ulta Beauty, Inc., and former President, CEO, and board member of U.S. Cellular).",False,no
+financebench_id_00839,hier_element_P10,Does Foot Locker's new CEO have previous CEO experience in a similar company to Footlocker?,Yes. She was previous CEO of Ulta Beauty which means she had to manage a large retail company that has brick and mortar + online business. So yes she was a CEO in a similar company to Foot Locker before this.,"**Key Numbers used:** 
+* Excerpt [2] notes Mary N. Dillon served as ""CEO for eight years"" at Ulta Beauty, Inc., and describes Ulta Beauty as a ""successful omni-channel retailer"" and the ""leading beauty destination in the U.S."" 
+* Excerpt [5] notes she is the ""former Executive Chair and Chief Executive Officer of Ulta Beauty, Inc.""
+
+**Answer:** 
+Yes. Foot Locker's new CEO, Mary N. Dillon, has previous CEO experience in the retail industry, having served as the CEO of Ulta Beauty, Inc. for eight years.",True,yes
+financebench_id_00839,hier_llm_P10,Does Foot Locker's new CEO have previous CEO experience in a similar company to Footlocker?,Yes. She was previous CEO of Ulta Beauty which means she had to manage a large retail company that has brick and mortar + online business. So yes she was a CEO in a similar company to Foot Locker before this.,"**Key Numbers and Facts Used:**
+* Mary N. Dillon appointed President and Chief Executive Officer of Foot Locker ([1], [4]).
+* Previous role: Former Executive Chair and Chief Executive Officer of Ulta Beauty, Inc. ([1], [4]).
+* Ulta Beauty described as being in the retail industry where Dillon established a ""remarkable track record"" ([3], [4]).
+
+**Final Answer:**
+Yes. Foot Locker's new CEO, Mary N. Dillon, has previous CEO experience as the former Executive Chair and Chief Executive Officer of Ulta Beauty, Inc., another company in the retail industry.",True,yes
+financebench_id_00839,oracle,Does Foot Locker's new CEO have previous CEO experience in a similar company to Footlocker?,Yes. She was previous CEO of Ulta Beauty which means she had to manage a large retail company that has brick and mortar + online business. So yes she was a CEO in a similar company to Foot Locker before this.,"**Key Information Used:**
+- Mary N. Dillon has been appointed President and Chief Executive Officer of Foot Locker, effective September 1, 2022.
+- She is the ""former Executive Chair and Chief Executive Officer of Ulta Beauty, Inc.""
+
+**Final Answer:** 
+Yes, Foot Locker's new CEO, Mary N. Dillon, has previous CEO experience as the former Chief Executive Officer of Ulta Beauty, Inc.",True,yes
+financebench_id_01928,base_256,What Was AMCOR's Adjusted Non GAAP EBITDA for FY 2023,"AMCOR's Adj. EBITDA was $2,018mn in FY 2023",The provided excerpts do not contain the information for Amcor's Adjusted non-GAAP EBITDA for fiscal year 2023.,False,no
+financebench_id_01928,hier_element_P10,What Was AMCOR's Adjusted Non GAAP EBITDA for FY 2023,"AMCOR's Adj. EBITDA was $2,018mn in FY 2023","**Key Numbers:**
+* FY 2022 Adjusted EBITDA: $2,117 million [7]
+* FY 2023 Adjusted EBITDA: $2,018 million [7]
+
+**Final Answer:**
+For fiscal year 2023, Amcor's Adjusted EBITDA was $2,018 million (compared to $2,117 million in fiscal year 2022).",True,yes
+financebench_id_01928,hier_llm_P10,What Was AMCOR's Adjusted Non GAAP EBITDA for FY 2023,"AMCOR's Adj. EBITDA was $2,018mn in FY 2023","**Key Numbers Used:**
+* FY 2022 Adjusted EBITDA: $2,117 million [7]
+* FY 2023 Adjusted EBITDA: $2,018 million [7]
+
+**Final Answer:**
+Amcor's Adjusted EBITDA for fiscal year 2023 was $2,018 million [7].",True,yes
+financebench_id_01928,oracle,What Was AMCOR's Adjusted Non GAAP EBITDA for FY 2023,"AMCOR's Adj. EBITDA was $2,018mn in FY 2023","**Key Numbers Used:**
+* Adjusted EBITDA for the Twelve Months Ended June 30, 2023 (FY 2023): $2,018 million
+
+**Short Final Answer:**
+Amcor's Adjusted EBITDA for FY 2023 was $2,018 million.",True,yes
+financebench_id_01912,base_256,Which region had the worst topline performance for MGM during FY2022?,MGM China experienced the worst topline performance amongst the other regions presented. Its revenue declined 44% in FY2022 whereas the other regions presented increased their revenues.,"**Key Numbers Used:**
+* MGM China net revenues (FY2022): $674 million (compared to $1.2 billion in the prior year, a decrease of 44%) [4]
+* Consolidated net revenues (FY2022): $13.1 billion [6]
+
+**Short Final Answer:**
+Based on the excerpts, MGM China had the worst topline performance, experiencing a 44% decrease in net revenues down to $674 million for the full year 2022 [4].",True,yes
+financebench_id_01912,hier_element_P10,Which region had the worst topline performance for MGM during FY2022?,MGM China experienced the worst topline performance amongst the other regions presented. Its revenue declined 44% in FY2022 whereas the other regions presented increased their revenues.,"**Key Numbers Used:**
+From Excerpt [9] (Consolidated Revenues for the Year Ended December 31, 2022):
+* Las Vegas Strip Resorts: $8,398,372 (thousand)
+* Regional Operations: $3,815,885 (thousand)
+* MGM China: $673,593 (thousand)
+* Management and other operations: $239,635 (thousand)
+
+**Answer:**
+Excluding management and other operations, **MGM China** had the lowest net revenues ($673,593 thousand) and thus the worst topline performance for MGM during FY2022.",True,yes
+financebench_id_01912,hier_llm_P10,Which region had the worst topline performance for MGM during FY2022?,MGM China experienced the worst topline performance amongst the other regions presented. Its revenue declined 44% in FY2022 whereas the other regions presented increased their revenues.,"**Key Numbers Used:**
+* FY2022 Net Revenues by Region (Excerpts [4] and [8]):
+  * Las Vegas Strip Resorts: $8,398,372 (thousand) / ~$8.4 billion
+  * Regional Operations: $3,815,885 (thousand) / ~$3.8 billion
+  * MGM China: $673,593 (thousand) / ~$674 million (down 44% compared to $1.2 billion in the prior year)
+  * Management and other operations: $239,635 (thousand) / ~$240 million
+
+**Short Final Answer:**
+Management and other operations had the lowest topline revenue ($239,635 thousand) for FY2022. If considering regional gaming/resort operations specifically, MGM China had the lowest revenu",True,no
+financebench_id_01912,oracle,Which region had the worst topline performance for MGM during FY2022?,MGM China experienced the worst topline performance amongst the other regions presented. Its revenue declined 44% in FY2022 whereas the other regions presented increased their revenues.,"**Key Numbers Used:**
+* Las Vegas Strip Resorts: Increase of 77% ($8.4 billion vs. $4.7 billion)
+* Regional Operations: Increase of 12% ($3.8 billion vs. $3.4 billion)
+* MGM China: Decrease of 44% ($674 million vs. $1.2 billion)
+
+**Final Answer:**
+MGM China had the worst topline performance, showing a decrease of 44% in net revenues.",True,yes
+financebench_id_01488,base_256,"Which business segment of JnJ will be treated as a discontinued operation from August 30, 2023 onward?","The Consumer Health business segment will be treated as a discontinued operation from August 30, 2023 onward.","**Key Excerpt:**
+[4] ""As previously announced, the Company recently completed an exchange offer to finalize the separation of Kenvue Inc., formerly Johnson & Johnson’s Consumer Health business. As a result of the completion of the exchange offer, Johnson & Johnson will now present its Consumer Health business financial results as discontinued operations...""
+
+**Answer:**
+Consumer Health (Kenvue Inc.)",True,yes
+financebench_id_01488,hier_element_P10,"Which business segment of JnJ will be treated as a discontinued operation from August 30, 2023 onward?","The Consumer Health business segment will be treated as a discontinued operation from August 30, 2023 onward.","**Key Numbers Used:**
+* Excerpt [1]: ""...Johnson & Johnson will now present its Consumer Health business financial results as discontinued operations...""
+* Excerpt [3]: ""On August 30, 2023, Johnson & Johnson issued the attached press release (Exhibit 99.1) providing updated financials and 2023 guidance following completion of the Kenvue Separation.""
+
+**Final Answer:**
+Johnson & Johnson's Consumer Health business (Kenvue Inc.).",True,yes
+financebench_id_01488,hier_llm_P10,"Which business segment of JnJ will be treated as a discontinued operation from August 30, 2023 onward?","The Consumer Health business segment will be treated as a discontinued operation from August 30, 2023 onward.","**Key Numbers/Excerpts:**
+* Excerpt [2]: ""...Johnson & Johnson will now present its Consumer Health business financial results as discontinued operations...""
+
+**Short Final Answer:**
+The Consumer Health business will be treated as a discontinued operation.",True,yes
+financebench_id_01488,oracle,"Which business segment of JnJ will be treated as a discontinued operation from August 30, 2023 onward?","The Consumer Health business segment will be treated as a discontinued operation from August 30, 2023 onward.","**Key Information Used:**
+* ""...Johnson & Johnson will now present its Consumer Health business financial results as discontinued operations...""
+
+**Final Answer:**
+The Consumer Health business segment will be treated as a discontinued operation.",True,yes
+financebench_id_01275,base_256,"Among operations, investing, and financing activities, which brought in the most (or lost the least) cash flow for Best Buy in FY2023?",Best Buy generated the most cash flow from operating activities in FY 2023 ($1.8 bn),"**Key Numbers (FY2023):**
+* Total cash provided by (used in) Operating activities: $1,824 million [6]
+* Total cash provided by (used in) Investing activities: $(962) million [6]
+* Total cash provided by (used in) Financing activities: $(1,806) million [6]
+
+**Answer:**
+Operating activities brought in the most cash flow for Best Buy in FY2023 ($1,824 million), whereas investing and financing activities both resulted in cash outflows.",True,yes
+financebench_id_01275,hier_element_P10,"Among operations, investing, and financing activities, which brought in the most (or lost the least) cash flow for Best Buy in FY2023?",Best Buy generated the most cash flow from operating activities in FY 2023 ($1.8 bn),"**Key Numbers for FY2023:**
+* Operating activities: $1,824 million ([6])
+* Investing activities: $(962) million ([6])
+* Financing activities: $(1,806) million ([6])
+
+**Short Final Answer:**
+Operating activities brought in the most cash flow ($1,824 million) for Best Buy in FY2023.",True,yes
+financebench_id_01275,hier_llm_P10,"Among operations, investing, and financing activities, which brought in the most (or lost the least) cash flow for Best Buy in FY2023?",Best Buy generated the most cash flow from operating activities in FY 2023 ($1.8 bn),"**Key Numbers (FY2023 / January 28, 2023):**
+* Operating activities: $1,824 million (or $1,824 in [4] / [5])
+* Investing activities: $(962) million (or $(962) in [4] / [5])
+* Financing activities: $(1,806) million (or $(1,806) in [4] / [5])
+
+**Short Final Answer:**
+Operating activities brought in the most cash flow ($1,824 million) for Best Buy in FY2023.",True,yes
+financebench_id_01275,oracle,"Among operations, investing, and financing activities, which brought in the most (or lost the least) cash flow for Best Buy in FY2023?",Best Buy generated the most cash flow from operating activities in FY 2023 ($1.8 bn),"**Key Numbers Used (Fiscal Year Ended January 28, 2023):**
+* Total cash provided by operating activities: $1,824 million
+* Total cash used in investing activities: $(962) million
+* Total cash used in financing activities: $(1,806) million
+
+**Final Answer:**
+Operating activities brought in the most cash flow ($1,824 million provided) for the company in FY2023.",True,yes
+financebench_id_01911,base_256,What was MGM's interest coverage ratio using FY2022 Adjusted EBIT as the numerator and annual Interest Expense as the denominator?,"As adjusted EBIT is negative, coverage ratio is zero","Based on the provided excerpts, there is no mention of MGM's ""interest coverage ratio"" or ""annual Interest Expense."" Therefore, the excerpts do not contain the information required to calculate this.",False,no
+financebench_id_01911,hier_element_P10,What was MGM's interest coverage ratio using FY2022 Adjusted EBIT as the numerator and annual Interest Expense as the denominator?,"As adjusted EBIT is negative, coverage ratio is zero",The provided excerpts do not contain the information needed to calculate the interest coverage ratio using FY2022 Adjusted EBIT and annual Interest Expense.,False,no
+financebench_id_01911,hier_llm_P10,What was MGM's interest coverage ratio using FY2022 Adjusted EBIT as the numerator and annual Interest Expense as the denominator?,"As adjusted EBIT is negative, coverage ratio is zero","Based on the provided excerpts, there is no mention or calculation of ""Adjusted EBIT"" or an ""interest coverage ratio."" Therefore, the excerpts do not contain the necessary information to answer this question.",False,no
+financebench_id_01911,oracle,What was MGM's interest coverage ratio using FY2022 Adjusted EBIT as the numerator and annual Interest Expense as the denominator?,"As adjusted EBIT is negative, coverage ratio is zero",The provided excerpts do not contain the figure for FY2022 Adjusted EBIT (they only provide Adjusted EBITDAR and annual Interest expense).,False,no
+financebench_id_01482,base_256,"At the Pepsico AGM held on May 3, 2023, what was the outcome of the shareholder vote on the shareholder proposal for a congruency report by Pepsico on net-zero emissions policies?",The shareholder proposal for a congruency report by Pepsico on net-zero emissions policies was defeated.,"**Key Numbers Used:**
+* Proposal regarding net-zero emissions policies:
+  * For: 19,718,780
+  * Against: 977,228,788
+  * Abstain: 23,200,321
+  * Broker Non-Votes: 172,969,325
+
+**Final Answer:**
+The shareholder proposal on net-zero emissions policies was defeated.",True,yes
+financebench_id_01482,hier_element_P10,"At the Pepsico AGM held on May 3, 2023, what was the outcome of the shareholder vote on the shareholder proposal for a congruency report by Pepsico on net-zero emissions policies?",The shareholder proposal for a congruency report by Pepsico on net-zero emissions policies was defeated.,"Based on the provided excerpts, the information regarding specific vote counts for the net-zero emissions policies proposal is not mentioned, but the outcome of the vote is stated.
+
+**Key Information:**
+* Excerpt [1]: ""The shareholder proposal regarding a congruency report on net-zero emissions policies was defeated""
+
+**Final Answer:**
+The shareholder proposal regarding a congruency report on net-zero emissions policies was defeated.",True,yes
+financebench_id_01482,hier_llm_P10,"At the Pepsico AGM held on May 3, 2023, what was the outcome of the shareholder vote on the shareholder proposal for a congruency report by Pepsico on net-zero emissions policies?",The shareholder proposal for a congruency report by Pepsico on net-zero emissions policies was defeated.,"Key numbers/excerpts used:
+- Excerpt [1]: ""(8) The shareholder proposal regarding a congruency report on net-zero emissions policies was defeated:""
+
+Final Answer:
+The shareholder proposal regarding a congruency report on net-zero emissions policies was defeated.",True,yes
+financebench_id_01482,oracle,"At the Pepsico AGM held on May 3, 2023, what was the outcome of the shareholder vote on the shareholder proposal for a congruency report by Pepsico on net-zero emissions policies?",The shareholder proposal for a congruency report by Pepsico on net-zero emissions policies was defeated.,"Based on the provided excerpts, the exact date of the AGM is not mentioned, but the outcome of the shareholder proposal is provided. 
+
+**Key Numbers Used:**
+* For: 19,718,780
+* Against: 977,228,788
+
+**Final Answer:**
+The shareholder proposal regarding a congruency report on net-zero emissions policies was defeated.",True,yes

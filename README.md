@@ -40,6 +40,7 @@ Our project investigates different chunking and retrieval strategies to understa
 - Does understanding document structure improve retrieval?
 - Can an LLM identify better chunk boundaries than traditional rules?
 - Can hierarchical retrieval improve the accuracy of document search?
+- Does better retrieval lead to more correct answers?
 - How do these methods perform on financial tables and numerical questions?
 
 We first implemented existing approaches from a research paper and then explored two improvements suggested by our professor:
@@ -73,7 +74,7 @@ Each question comes with:
 
 We initially worked with the available FinanceBench questions and selected a subset of documents containing at most 100 pages because PDF parsing and processing can be time-consuming.
 
-All the chunking and retrieval methods were evaluated on the same 42 questions to ensure a consistent comparison.
+All the chunking and retrieval methods were evaluated on the same 42 questions to ensure a consistent comparison. The list of questions is in `data/processed/used_questions.csv`.
 
 **Important:** Our 42-question subset comes from FinanceBench. It is not the exact evaluation subset used in the original research paper.
 
@@ -93,7 +94,8 @@ Our experimental pipeline follows these steps:
 6. Retrieve the top 10 most relevant chunks.
 7. Compare the retrieved information with the original gold evidence.
 8. Calculate evaluation metrics.
-9. Compare the performance of different approaches.
+9. Give the retrieved chunks to an LLM, let it answer the question, and grade the answers.
+10. Compare the performance of different approaches.
 
 ### Embedding Model
 
@@ -231,9 +233,7 @@ First, we identify the relevant section of the library. Then, we search for the 
 
 #### Level 1: Page-Level Retrieval
 
-Each page of a financial document is represented by a short textual digest.
-
-We take the extracted elements from a page and create a short representation of that page.
+Each page of a financial document is represented by a short textual digest (the first 150 characters of each element on the page).
 
 This representation is converted into an embedding vector.
 
@@ -290,6 +290,8 @@ We introduced this stricter metric because fixed-size chunks can sometimes span 
 
 For example, a 512-token chunk might contain text from two different pages. Simply counting any overlap with the gold page could make larger chunks appear better than they actually are.
 
+All results in this README use the strict score unless stated otherwise.
+
 ### 5.3 Text Retrieved
 
 This measures the average number of characters returned in the top 10 retrieved chunks.
@@ -316,13 +318,19 @@ This helps us understand how well different methods retrieve information from fi
 
 Our evaluation subset contains 11 such questions.
 
+### 5.7 Answer Accuracy
+
+We give Gemini 3.5 Flash-Lite the question and the 10 chunks retrieved by a method, ask it to answer using only those chunks, and then ask the same model to grade the answer against FinanceBench's reference answer (the key number or fact must match; rounding and formatting differences are accepted; "the excerpts do not contain this" counts as wrong).
+
+As a reference point we add an **oracle** row, where the model is given the gold evidence text instead of retrieved chunks. This shows how well the model performs when retrieval is perfect.
+
 ---
 
 ## 6. Experimental Results
 
 All the following results are based on the same 42 questions.
 
-### 6.1 Main Results
+### 6.1 Retrieval Results
 
 | Method                        | Strict Page Score | Avg. Text Retrieved (Characters) | ROUGE-L F1 | Table Question Accuracy |
 | ----------------------------- | ----------------: | -------------------------------: | ---------: | ----------------------: |
@@ -335,6 +343,8 @@ All the following results are based on the same 42 questions.
 | LLM Chunking (Prefix)         |             73.8% |                            6,976 |       0.50 |                   45.5% |
 | Hierarchical + Element (P=10) |             85.7% |                            7,812 |       0.51 |                   72.7% |
 | **Hierarchical + LLM (P=10)** |         **88.1%** |                        **5,894** |   **0.52** |               **72.7%** |
+
+Hierarchical + LLM has the highest score in this table, but its lead over Fixed 256 is one question (88.1% vs 85.7%) and is not statistically meaningful (Section 8). A fair summary is that it **matches the best fixed-size baseline while retrieving about 40% less text** (5,894 vs 9,745 characters). Fixed 128 retrieves less text still (4,983) but scores lower (83.3%).
 
 ### 6.2 Effect of Different P Values
 
@@ -353,11 +363,47 @@ Selecting too few pages can exclude the page containing the required evidence.
 
 Selecting too many pages increases the search space and gradually reduces the advantage of hierarchical retrieval.
 
+Note that P = 10 was chosen after looking at these results (see Limitations).
+
+### 6.3 Answer Accuracy (End-to-End)
+
+| Method (top-10 chunks given to the LLM) | Correct answers (of 42) | Accuracy | Table-like questions correct (of 11) |
+| --------------------------------------- | ----------------------: | -------: | -----------------------------------: |
+| Fixed 256                               |                      23 |    54.8% |                            4 (36.4%) |
+| Hierarchical + Element (P=10)           |                      23 |    54.8% |                            4 (36.4%) |
+| Hierarchical + LLM (P=10)               |                      25 |    59.5% |                            5 (45.5%) |
+| Oracle (gold evidence given directly)   |                      27 |    64.3% |                           10 (90.9%) |
+
+Paired comparison (questions where only one method answered correctly):
+
+| Comparison                                   | A only | B only | p-value |
+| -------------------------------------------- | -----: | -----: | ------: |
+| Hierarchical + LLM vs Fixed 256              |      6 |      4 |   0.754 |
+| Hierarchical + Element vs Fixed 256          |      5 |      5 |   1.000 |
+| Hierarchical + LLM vs Hierarchical + Element |      2 |      0 |   0.500 |
+
+**Interpretation:**
+
+- All three retrieval methods give statistically indistinguishable answer accuracy. Hierarchical + LLM answers two more questions than Fixed 256, which is within noise.
+- Combined with Section 6.1, the supported claim is: hierarchical retrieval with LLM chunks gives **the same answer quality as the best fixed-size baseline using about 40% less retrieved text.**
+- **Table questions are the main weakness.** With the gold evidence the model answers 10 of 11 table-like questions, but with any retrieval method only 4 or 5. Fixed 256 found the right page for 81.8% of these questions (Section 6.1), so the right page is often retrieved but the chunk the model sees does not contain the needed part of the table. Page accuracy therefore overstates how useful retrieval is for numerical questions.
+- The oracle is not a strict ceiling. It scores 64.3% because the model or the grader sometimes fails even with the gold evidence (for example, one question needs Adjusted EBIT, which is not in the gold evidence text), and on the 31 non-table questions Fixed 256 answered 19 correctly versus 17 for the oracle. Single-question differences should not be over-read.
+
+**Grader check:** for 10 questions (40 answers) we compared the LLM judge with our own manual review. They agreed on 39 of 40 answers. The one disagreement (a Hierarchical + LLM answer on an MGM revenue question, where the main answer named the wrong segment and only hedged toward the correct one) was a case where the judge was slightly lenient. The reviewed rows are in `results/answers/check_these.csv`.
+
+### 6.4 Additional Ideas Tried and Not Kept
+
+We also tested three cheap add-ons to hierarchical retrieval on both chunk types, in all 8 combinations at P = 5 and P = 10: contextual headers (document name and section heading added before embedding), hybrid search (BM25 + dense embeddings combined with reciprocal-rank fusion), and pooled page vectors (page embedding = mean of its chunk embeddings).
+
+- None of them improved strict page accuracy. Contextual headers and hybrid search left it unchanged for element chunks and lowered it by 1 to 4 questions for LLM chunks.
+- Pooled page vectors hurt in every combination (for example, 85.7% to 69.0% for element chunks at P = 10).
+- Headers plus hybrid search raised ROUGE-L F1 (0.51 to 0.57 for element chunks, 0.52 to 0.59 for LLM chunks) without improving page accuracy, at the cost of retrieving more text. We did not test this gain statistically.
+
+We did not keep these experiments in the repository, and they are not part of the reported results.
+
 ---
 
 ## 7. Key Findings and Observations
-
-Our experiments provided several interesting findings.
 
 ### Finding 1: Fixed-Size Chunking Performs Surprisingly Well
 
@@ -365,7 +411,7 @@ We initially expected more sophisticated chunking approaches to outperform fixed
 
 However, the results show that fixed 128-token and 256-token chunking performed better than standalone element-based and LLM-based chunking in terms of strict page accuracy.
 
-This demonstrates that more advanced chunking does not automatically guarantee better retrieval.
+This demonstrates that more advanced chunking does not automatically guarantee better retrieval. (We were also unable to reproduce an advantage for element-based chunking over fixed-size chunking on our data.)
 
 ### Finding 2: Element-Based Chunking Has Ranking Challenges
 
@@ -386,99 +432,92 @@ LLM-based chunking helped identify more meaningful topic boundaries.
 
 However, it did not significantly improve retrieval accuracy when used independently.
 
-It did retrieve less text than some fixed-size baselines, but its standalone accuracy remained lower than the best fixed-size approaches.
+It did retrieve less text than most fixed-size baselines, but its standalone accuracy (78.6%) remained lower than the best fixed-size approaches.
 
-### Finding 4: Hierarchical Retrieval Improved Performance
+### Finding 4: Hierarchical Retrieval Improved on Its Own Flat Version
 
-This was the most promising result of our experiments.
+This was the most consistent result of our experiments.
 
-With P = 10:
+With P = 10, compared with the same chunks searched without the page level:
 
-- Element-based retrieval improved from 73.8% to 85.7%.
-- LLM-based retrieval improved from 78.6% to 88.1%.
+- Element-based retrieval improved from 73.8% to 85.7% (5 questions gained, 0 lost).
+- LLM-based retrieval improved from 78.6% to 88.1% (4 gained, 0 lost).
+- Table-question accuracy improved from 45.5% to 72.7% for both configurations.
 
-It also improved table-question accuracy from 45.5% to 72.7% for both hierarchical configurations.
+Fixed 256 and Fixed 512 still score higher on table questions (81.8%), so hierarchical retrieval narrows but does not close that gap.
 
-This suggests that identifying relevant pages before searching individual chunks can be beneficial.
+This suggests that identifying relevant pages before searching individual chunks can help.
 
-### Finding 5: Better Retrieval Does Not Always Require More Text
+### Finding 5: Similar Accuracy with Less Retrieved Text
 
-Our best-performing configuration, Hierarchical + LLM, achieved 88.1% strict page accuracy while retrieving approximately 5,894 characters on average.
+Hierarchical + LLM (88.1%) matched Fixed 256 (85.7%) while retrieving about 40% less text (5,894 vs 9,745 characters). It is also far more compact than Fixed 512 (19,370 characters, 78.6%).
 
-For comparison, Fixed 512 achieved 78.6% accuracy while retrieving approximately 19,370 characters.
+The same holds for answer accuracy (Section 6.3): no meaningful difference between methods, with less text sent to the LLM.
 
-This suggests that hierarchical retrieval can achieve better evidence-page retrieval with considerably less retrieved text.
+### Finding 6: Retrieving the Right Page Is Not the Same as Retrieving the Right Content
+
+On table-like questions the model answers 10 of 11 with the gold evidence but only 4 to 5 with any retrieval method, even where the right page was found. Improving chunking and ranking for tables is the clearest remaining problem.
 
 ---
 
 ## 8. Paired Statistical Analysis
 
-In addition to comparing overall accuracy, we also examined the question-by-question differences between methods.
+In addition to comparing overall accuracy, we examined the question-by-question differences between methods (strict page score, exact sign test; A wins = questions A retrieved correctly and B did not).
 
-The purpose was to determine whether hierarchical retrieval consistently helped on individual questions.
-
-The paired comparisons reported in our analysis were:
-
-| Comparison                          | A Wins | B Wins | p-value |
-| ----------------------------------- | -----: | -----: | ------: |
-| Hierarchical vs Flat (Element)      |      5 |      0 |   0.062 |
-| Hierarchical vs Flat (LLM)          |      4 |      0 |   0.125 |
-| Hierarchical (Element) vs Fixed 256 |      4 |      4 |   1.000 |
-| Hierarchical (LLM) vs Fixed 512     |      6 |      2 |   0.290 |
+| Comparison                                     | A Wins | B Wins | p-value |
+| ---------------------------------------------- | -----: | -----: | ------: |
+| Hierarchical vs Flat (same element chunks)     |      5 |      0 |   0.062 |
+| Hierarchical vs Flat (same LLM chunks)         |      4 |      0 |   0.125 |
+| Hierarchical (Element) vs Element (Prefix)     |      4 |      0 |   0.125 |
+| Hierarchical (Element) vs Fixed 128            |      4 |      3 |   1.000 |
+| Hierarchical (Element) vs Fixed 256            |      4 |      4 |   1.000 |
+| Hierarchical (Element) vs Fixed 512            |      7 |      4 |   0.549 |
+| Hierarchical (LLM) vs Fixed 128                |      4 |      2 |   0.688 |
+| Hierarchical (LLM) vs Fixed 256                |      3 |      2 |   1.000 |
+| Hierarchical (LLM) vs Fixed 512                |      6 |      2 |   0.289 |
+| LLM chunking (flat) vs Element chunking (flat) |      2 |      0 |   0.500 |
 
 **Interpretation:**
 
-Hierarchical retrieval consistently improved or maintained performance against its corresponding flat retrieval method in the reported paired comparisons.
+Hierarchical retrieval never lost a question to its own flat version, which is directionally consistent. Against the fixed-size baselines it is statistically tied.
 
-However, the p-values are above the conventional 0.05 threshold.
-
-Therefore, these improvements should be described as promising and directionally consistent, rather than statistically significant.
-
-The relatively small evaluation set of 42 questions also limits the strength of statistical conclusions.
+No comparison reaches the conventional 0.05 threshold, so improvements should be described as promising and directionally consistent, not statistically significant. The small evaluation set of 42 questions limits the strength of any conclusion (one question is about 2.4 percentage points, and the uncertainty on each accuracy is roughly +/-11 points).
 
 ---
 
 ## 9. Limitations
 
-Although the experiments produced promising results, there are some limitations.
-
 1. **Small Evaluation Dataset:** We evaluated only 42 questions. Larger datasets are required to establish stronger conclusions.
 
 2. **Limited Document Length:** We selected documents containing at most 100 pages. The results may differ for longer financial reports.
 
-3. **Limited Models:** We used one primary embedding model and one LLM for the reported experiments.
+3. **Limited Models:** We used one embedding model and one LLM (Gemini 3.5 Flash-Lite) for all reported experiments.
 
-4. **Retrieval-Only Evaluation:** We evaluated how effectively the system retrieves evidence. We did not evaluate the correctness of the final answers generated by an LLM.
+4. **LLM Judge for Answer Accuracy:** The same model that generates the answers also grades them. We checked 40 answers manually (39 agreed), but this is a small sample, and the answer-accuracy results come from a single run without repeated trials.
 
 5. **Element-Based Implementation:** Our implementation follows the rules described in the research paper but uses Unstructured for PDF parsing rather than the paper's Chipper-based approach.
 
 6. **Parameter Selection:** P = 10 performed best, but this value was selected after examining the experimental results. Therefore, the results should be interpreted with this limitation in mind.
 
+7. **Multiple Configurations Tried:** Besides the methods reported here we tried 16 add-on configurations (Section 6.4). They are reported as a negative result, not as part of the main comparison.
+
 ---
 
 ## 10. Future Improvements
 
-There are several possible directions for extending this project.
-
 These are potential experiments and should not be confused with methods already implemented.
 
-| Proposed Improvement      | Description                                                                                     |
-| ------------------------- | ----------------------------------------------------------------------------------------------- |
-| Contextual Headers        | Add document names and relevant section headings to chunks before embedding.                    |
-| Hybrid Search             | Combine keyword-based search (BM25) with semantic embedding search.                             |
-| LLM Query Rewriting       | Rewrite questions using relevant financial terminology before retrieval.                        |
-| Reranking                 | Retrieve more candidate chunks and use a stronger model to rerank them.                         |
-| Page-Vector Pooling       | Create page embeddings by combining the embeddings of individual chunks belonging to that page. |
-| Larger Evaluation Dataset | Evaluate the approaches on more FinanceBench questions and longer reports.                      |
-| Answer Generation         | Evaluate whether improved retrieval also produces more accurate final answers.                  |
-
-These improvements could help address the ranking problems identified during our experiments, particularly for financial tables and numerical questions.
+| Proposed Improvement      | Description                                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------------------- |
+| Better Table Retrieval    | Keep whole tables together with their captions and units, or index table rows separately.   |
+| LLM Query Rewriting       | Rewrite questions using relevant financial terminology before retrieval.                    |
+| Reranking                 | Retrieve more candidate chunks and use a stronger model to rerank them.                     |
+| Larger Evaluation Dataset | Evaluate the approaches on more FinanceBench questions and longer reports.                  |
+| More Models               | Repeat the experiments with other embedding models and LLMs, and with an independent judge. |
 
 ---
 
 ## 11. Repository Structure
-
-The repository is organized into different directories for data, source code and experimental results.
 
 ```text
 financial-report-chunking/
@@ -488,7 +527,8 @@ financial-report-chunking/
 │   │   └── Original FinanceBench dataset
 │   │
 │   └── processed/
-│       └── Processed questions and document metadata
+│       ├── Processed questions and document metadata
+│       └── used_questions.csv        (the 42 questions used)
 │
 ├── src/
 │   ├── download_pdfs.py
@@ -500,40 +540,58 @@ financial-report-chunking/
 │   ├── run_element.py
 │   ├── run_llm.py
 │   ├── run_hier.py
+│   ├── run_answers.py                (answer generation and grading)
 │   ├── fair_metrics.py
+│   ├── paired_stats.py
 │   ├── diagnose_element.py
 │   └── zip_subset.py
 │
 ├── results/
-│   └── retrieval/
-│       └── Experimental retrieval results and comparison summaries
+│   ├── retrieval/
+│   │   └── Retrieval results, fair_summary.csv, paired_stats.csv
+│   └── answers/
+│       └── answers.jsonl, answers_summary.csv, check_these.csv
 │
 ├── subset_pdfs.zip
 ├── requirements.txt
 └── README.md
 ```
 
-**Note:** Generated intermediate files, PDF parsing outputs, embedding indexes and LLM caches are not all included in the repository.
+**Note:** Generated intermediate files, PDF parsing outputs, embedding indexes and LLM caches are not included in the repository.
+
+### How to reproduce (from the repository root)
+
+```text
+python src/parse_pdfs.py --strategy hi_res --max-pages 100
+python src/run_baselines.py
+python src/run_element.py
+python src/run_llm.py --model gemini-3.5-flash-lite --max-pages 100     # needs LLM_API_KEY
+python src/run_hier.py --chunks element --max-pages 100
+python src/run_hier.py --chunks llm --model gemini-3.5-flash-lite --max-pages 100
+python src/fair_metrics.py
+python src/paired_stats.py
+python src/run_answers.py                                              # needs LLM_API_KEY
+```
+
+API keys are read from the `LLM_API_KEY` environment variable and are never stored in the repository.
 
 ---
 
 ## 12. Technologies Used
 
-The project uses the following technologies and libraries:
-
-| Technology            | Purpose                                             |
-| --------------------- | --------------------------------------------------- |
-| Python                | Main programming language                           |
-| FinanceBench          | Financial question-answering benchmark              |
-| PyMuPDF               | Extracting text from PDF documents                  |
-| Unstructured          | Extracting structural elements from PDFs            |
-| Gemini 3.5 Flash-Lite | Identifying topic boundaries for LLM-based chunking |
-| Sentence Transformers | Generating embeddings                               |
-| NumPy                 | Vector similarity calculations                      |
-| Pandas                | Data processing and result analysis                 |
-| ROUGE                 | Measuring text overlap                              |
-| BLEU                  | Measuring text overlap                              |
-| tiktoken              | Token counting and fixed-size chunking              |
+| Technology            | Purpose                                                      |
+| --------------------- | ------------------------------------------------------------ |
+| Python                | Main programming language                                    |
+| FinanceBench          | Financial question-answering benchmark                       |
+| PyMuPDF               | Extracting text from PDF documents                           |
+| Unstructured          | Extracting structural elements from PDFs                     |
+| Gemini 3.5 Flash-Lite | Chunk boundaries for LLM-based chunking; answers and grading |
+| Sentence Transformers | Generating embeddings                                        |
+| NumPy                 | Vector similarity calculations                               |
+| Pandas                | Data processing and result analysis                          |
+| ROUGE                 | Measuring text overlap                                       |
+| BLEU                  | Measuring text overlap                                       |
+| tiktoken              | Token counting and fixed-size chunking                       |
 
 ---
 
@@ -557,14 +615,15 @@ https://github.com/patronus-ai/financebench
 
 ## 14. Conclusion
 
-This project investigates how different chunking strategies affect information retrieval from financial reports in RAG systems.
+This project investigates how different chunking strategies and retrieval designs affect information retrieval from financial reports in RAG systems.
 
-We implemented fixed-size chunking, element-based chunking and LLM-based chunking. We then introduced hierarchical retrieval to improve the process of finding relevant information.
+We implemented fixed-size chunking, element-based chunking and LLM-based chunking, and added hierarchical (page-then-chunk) retrieval. On our 42-question evaluation set:
 
-Our experiments showed that standalone LLM-based chunking did not outperform the best fixed-size baseline. However, combining LLM-based chunking with hierarchical retrieval achieved our best result of **88.1% strict page accuracy** on the 42-question evaluation set.
+- Standalone element-based and LLM-based chunking did not beat the best fixed-size baselines.
+- Hierarchical retrieval consistently improved on its own flat version (no question lost), and combined with LLM chunking it reached 88.1% strict page accuracy, matching Fixed 256 (85.7%) while retrieving about 40% less text.
+- End-to-end answer accuracy was statistically indistinguishable across methods (54.8% to 59.5%), so the reduction in retrieved text did not cost answer quality.
+- Numerical and table questions remain the main weakness: the right page is often found, but the model answers only 4 to 5 of 11 table-like questions with retrieved text versus 10 of 11 with the gold evidence.
 
-The experiments suggest that identifying relevant pages before searching individual chunks can improve retrieval performance while reducing the amount of text retrieved.
+With only 42 questions, one embedding model and one LLM, these results are suggestive rather than conclusive.
 
-The project also highlights the challenges of retrieving numerical information from financial tables and provides several directions for future research.
-
-**Our main takeaway: Better document retrieval is not just about how we divide documents into chunks. It is also about how intelligently we search through those chunks.**
+**Our main takeaway: better document retrieval is not just about how we divide documents into chunks. It is also about how intelligently we search through those chunks, and for financial tables, finding the right page is not enough.**
